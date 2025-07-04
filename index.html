@@ -49,14 +49,38 @@
           [51.181690043282, 16.98464393814163]
         ],
         url: "https://docs.google.com/document/d/1KA8LdRnaG8oYa-MHvhLub6Y7blYS0mBk/edit?usp=sharing&ouid=112123792231571534585&rtpof=true&sd=true"
+        links: [
+          "https://www.google.com/maps?q=51.097500,17.072300",
+          "https://www.google.com/maps/place/51.0920,17.0600"
+        ]
       }
     ];
 
     areas.forEach(area => {
+      // Rysuj obszar (wielokąt)
       const polygon = L.polygon(area.coords, { color: 'blue' }).addTo(map);
       polygon.bindPopup(area.name);
       polygon.on('click', () => {
         window.open(area.url, '_blank');
+      });
+
+      // Zielone pinezki ze współrzędnych w linkach Google Maps
+      area.links?.forEach(link => {
+        const regex = /([-+]?[0-9]*\.?[0-9]+),([-+]?[0-9]*\.?[0-9]+)/;
+        const match = link.match(regex);
+        if (match) {
+          const lat = parseFloat(match[1]);
+          const lon = parseFloat(match[2]);
+
+          L.circleMarker([lat, lon], {
+            radius: 6,
+            color: 'green',
+            fillColor: 'green',
+            fillOpacity: 0.9
+          }).addTo(map).bindPopup(`Pinezka: ${lat.toFixed(5)}, ${lon.toFixed(5)}`);
+        } else {
+          console.warn("Nie udało się znaleźć współrzędnych w linku:", link);
+        }
       });
     });
   </script>
